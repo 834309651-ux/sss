@@ -2,223 +2,266 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <!-- 添加到主屏幕后的 App 样式配置 -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="激战2小助手">
-  <meta name="theme-color" content="#121418">
-  <title>激战2 星岬岛手机导航</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GW2 悬浮窗快捷面板</title>
   <style>
     :root {
-      --bg: #121418;
-      --card: #1c1f26;
-      --card-active: #262a33;
-      --text: #eef0f4;
-      --muted: #8e95a5;
-      --accent: #d9383a; /* 激战2经典红 */
-      --gold: #e5b869;   /* 传奇金 */
-      --border: #2a2e38;
+      --bg: #0e1014;
+      --panel: #161920;
+      --panel-hover: #212631;
+      --border: #2c313c;
+      --gold: #d4af6a;
+      --gold-dim: rgba(212, 175, 106, 0.25);
+      --accent: #b8292b;
+      --text: #e6e8ec;
+      --muted: #7d8597;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+      font-family: "Microsoft YaHei", -apple-system, sans-serif;
       background: var(--bg);
       color: var(--text);
-      padding-bottom: 40px;
-      line-height: 1.5;
+      font-size: 13px;
+      line-height: 1.4;
+      overflow-x: hidden;
     }
-    /* 顶部固定栏 */
-    .header {
+
+    /* 极细暗黑滚动条 */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: #333945; border-radius: 2px; }
+
+    /* 顶部紧凑搜索栏 */
+    .topbar {
       position: sticky;
       top: 0;
-      z-index: 100;
-      background: rgba(18, 20, 24, 0.92);
-      backdrop-filter: blur(10px);
-      padding: 14px 16px 10px;
+      z-index: 10;
+      background: rgba(14, 16, 20, 0.96);
+      padding: 8px 10px 6px;
       border-bottom: 1px solid var(--border);
-    }
-    .header-top {
       display: flex;
-      justify-content: space-between;
+      gap: 6px;
       align-items: center;
-      margin-bottom: 12px;
     }
-    .title {
-      font-size: 18px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .badge {
-      font-size: 11px;
-      background: var(--accent);
-      color: #fff;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-weight: 600;
-    }
-    .home-btn {
-      font-size: 13px;
-      color: var(--gold);
-      text-decoration: none;
-      padding: 4px 10px;
-      border: 1px solid rgba(229, 184, 105, 0.4);
-      border-radius: 16px;
-    }
-    /* 搜索框 */
-    .search-box {
-      width: 100%;
-      background: var(--card);
+    .search-input {
+      flex: 1;
+      background: var(--panel);
       border: 1px solid var(--border);
       color: var(--text);
-      padding: 10px 14px;
-      border-radius: 10px;
-      font-size: 14px;
+      padding: 5px 8px;
+      border-radius: 4px;
+      font-size: 12px;
       outline: none;
     }
-    .search-box:focus { border-color: var(--gold); }
-    .search-box::placeholder { color: var(--muted); }
+    .search-input:focus { border-color: var(--gold); }
+    .search-input::placeholder { color: var(--muted); }
 
-    /* 分类标签栏 */
+    .btn-home {
+      background: var(--panel);
+      border: 1px solid var(--gold-dim);
+      color: var(--gold);
+      text-decoration: none;
+      padding: 5px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      white-space: nowrap;
+      transition: 0.15s;
+    }
+    .btn-home:hover { background: var(--gold-dim); color: #fff; }
+
+    /* 紧凑分类标签 */
     .tabs {
       display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding: 12px 16px 4px;
-      scrollbar-width: none;
+      gap: 4px;
+      padding: 6px 10px;
+      border-bottom: 1px solid var(--border);
+      background: #12151b;
     }
-    .tabs::-webkit-scrollbar { display: none; }
     .tab {
-      flex-shrink: 0;
-      padding: 6px 14px;
-      background: var(--card);
+      flex: 1;
+      text-align: center;
+      padding: 4px 0;
+      font-size: 12px;
       color: var(--muted);
-      border-radius: 20px;
-      font-size: 13px;
-      border: 1px solid var(--border);
+      background: var(--panel);
+      border: 1px solid transparent;
+      border-radius: 3px;
       cursor: pointer;
+      transition: 0.15s;
     }
+    .tab:hover { color: var(--text); }
     .tab.active {
-      background: var(--accent);
-      color: #fff;
+      background: rgba(184, 41, 43, 0.2);
       border-color: var(--accent);
+      color: #ff6b6d;
       font-weight: 600;
     }
 
-    /* 内容区 */
-    .container { padding: 12px 16px; }
-    .section-title {
-      font-size: 14px;
+    /* 主内容区 */
+    .main { padding: 8px 10px 20px; }
+
+    .sec-title {
+      font-size: 11px;
       color: var(--gold);
-      font-weight: 600;
-      margin: 16px 0 10px;
+      margin: 10px 0 6px;
       display: flex;
       align-items: center;
-      gap: 6px;
+      justify-content: space-between;
+      letter-spacing: 0.5px;
     }
-    .section-title:first-child { margin-top: 4px; }
+    .sec-title:first-child { margin-top: 2px; }
+
+    /* 紧凑双列按钮网格 */
     .grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
+      gap: 6px;
     }
-    .card {
-      background: var(--card);
+    .item {
+      background: var(--panel);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px 12px;
+      border-radius: 4px;
+      padding: 7px 8px;
       text-decoration: none;
       color: var(--text);
       display: flex;
-      flex-direction: column;
-      gap: 4px;
-      transition: background 0.15s;
-    }
-    .card:active { background: var(--card-active); transform: scale(0.98); }
-    .card-head {
-      display: flex;
       align-items: center;
       gap: 6px;
-      font-size: 15px;
-      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.12s;
+      overflow: hidden;
     }
-    .card-desc {
-      font-size: 12px;
-      color: var(--muted);
-      white-space: nowrap;
+    .item:hover {
+      background: var(--panel-hover);
+      border-color: var(--gold-dim);
+    }
+    .item:active { transform: scale(0.97); }
+    .item-icon { font-size: 14px; flex-shrink: 0; }
+    .item-text {
       overflow: hidden;
       text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 12px;
     }
+
+    /* 一键复制代码标签 */
+    .code-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .code-chip {
+      background: #1a1d26;
+      border: 1px dashed #3d4454;
+      color: #c5cbd8;
+      padding: 4px 8px;
+      border-radius: 3px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .code-chip:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: var(--panel-hover);
+    }
+
     .empty {
       text-align: center;
       color: var(--muted);
-      padding: 40px 0;
-      font-size: 14px;
-    }
-    .footer-tip {
-      text-align: center;
-      color: var(--muted);
+      padding: 24px 0;
       font-size: 12px;
-      margin-top: 28px;
-      padding: 0 20px;
+    }
+
+    /* 复制成功轻提示 */
+    .toast {
+      position: fixed;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--gold);
+      color: #0e1014;
+      font-weight: 600;
+      font-size: 12px;
+      padding: 5px 14px;
+      border-radius: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.2s;
+      z-index: 99;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
     }
   </style>
 </head>
 <body>
 
-  <div class="header">
-    <div class="header-top">
-      <div class="title">
-        <span>⚔️ 星岬岛快捷导航</span>
-        <span class="badge">小队自用</span>
-      </div>
-      <a class="home-btn" href="https://gw2.wishingstarmoye.com/" target="_blank">原站首页 ↗</a>
-    </div>
-    <input type="text" id="searchInput" class="search-box" placeholder="搜索攻略、坐骑、日常、计时器..." />
+  <div class="topbar">
+    <input type="text" id="search" class="search-input" placeholder="🔍 搜索攻略 / 工具..." autocomplete="off">
+    <a class="btn-home" href="https://gw2.wishingstarmoye.com/">星岬岛 ↗</a>
   </div>
 
   <div class="tabs" id="tabs">
     <div class="tab active" data-cat="all">全部</div>
-    <div class="tab" data-cat="guide">热门攻略</div>
-    <div class="tab" data-cat="tool">高频工具</div>
-    <div class="tab" data-cat="db">数据库与配装</div>
+    <div class="tab" data-cat="guide">攻略</div>
+    <div class="tab" data-cat="tool">工具</div>
+    <div class="tab" data-cat="db">数据库</div>
   </div>
 
-  <div class="container" id="content"></div>
+  <div class="main">
+    <!-- 常用游戏代码一键复制（可自行增删） -->
+    <div class="sec-title">
+      <span>⚡ 一键复制代码（点完直接进游戏 Ctrl+V）</span>
+    </div>
+    <div class="code-list" id="codeList"></div>
 
-  <div class="footer-tip">
-    提示：点击浏览器菜单「添加到主屏幕」，即可像 App 一样全屏打开
+    <!-- 动态渲染的攻略/工具列表 -->
+    <div id="content"></div>
   </div>
+
+  <div class="toast" id="toast">已复制到剪贴板</div>
 
   <script>
-    // 以后想加新攻略或微调具体子页面链接，直接改这里的数据即可
     const BASE = "https://gw2.wishingstarmoye.com/";
+
+    // 1. 常用传送点/配装代码（按你们小队习惯随便改）
+    const QUICK_CODES = [
+      { name: "狮子拱门", code: "[&BC0AAAA=]" },
+      { name: "迷雾碎层入口", code: "[&BG8EAAA=]" },
+      { name: "北方之眼", code: "[&BAkMAAA=]" },
+      { name: "巫师塔", code: "[&BB8OAAA=]" },
+      { name: "亭石", code: "[&BGUNAAA=]" }
+    ];
+
+    // 2. 导航按钮数据（把 url 换成具体子页面链接即可直达）
     const DATA = [
-      // 热门攻略
-      { cat: "guide", icon: "🐉", title: "坐骑攻略", desc: "飞天鳞龙 / 狮鹫 / 甲虫 / 乌龟", url: BASE },
-      { cat: "guide", icon: "✨", title: "传奇装备制作", desc: "三代传奇 / 传奇饰品 / 护甲", url: BASE },
-      { cat: "guide", icon: "🏃", title: "跳跳乐攻略", desc: "全地图跳跳乐路线与宝箱", url: BASE },
-      { cat: "guide", icon: "⭐", title: "专精点获取", desc: "各资料片专精点速查", url: BASE },
-      { cat: "guide", icon: "🎣", title: "钓鱼手册", desc: "全地图鱼类时间与鱼饵", url: BASE },
-      { cat: "guide", icon: "⚒️", title: "副职业升级", desc: "裁缝 / 皮革 / 武器 / 厨师速冲", url: BASE },
-      { cat: "guide", icon: "🎒", title: "实用收藏攻略", desc: "32格背包 / 饥饿的猫 / 沉没宝箱", url: BASE },
-      { cat: "guide", icon: "🌱", title: "新手与80级向导", desc: "满级后做什么 / 装备获取", url: BASE },
+      // 攻略
+      { cat: "guide", icon: "🐉", title: "坐骑攻略", url: BASE },
+      { cat: "guide", icon: "✨", title: "传奇制作", url: BASE },
+      { cat: "guide", icon: "🏃", title: "跳跳乐", url: BASE },
+      { cat: "guide", icon: "⭐", title: "专精点", url: BASE },
+      { cat: "guide", icon: "🎣", title: "钓鱼手册", url: BASE },
+      { cat: "guide", icon: "⚒️", title: "副职升级", url: BASE },
+      { cat: "guide", icon: "🎒", title: "实用收藏", url: BASE },
+      { cat: "guide", icon: "🌱", title: "80级向导", url: BASE },
 
-      // 高频工具
-      { cat: "tool", icon: "⏰", title: "事件时间表", desc: "全图大型突破与事件倒计时", url: BASE },
-      { cat: "tool", icon: "👹", title: "BOSS 计时器", desc: "世界 BOSS 刷新时间提醒", url: BASE },
-      { cat: "tool", icon: "📋", title: "日常清单", desc: "每日必做与巫师宝库参考", url: BASE },
-      { cat: "tool", icon: "🗺️", title: "在线游戏地图", desc: "完整地图与细分点位查询", url: BASE },
-      { cat: "tool", icon: "🔑", title: "代码生成器", desc: "游戏内物品/传送点代码生成", url: BASE },
-      { cat: "tool", icon: "📢", title: "官方活动与平衡", desc: "国服活动 / 职业平衡预览", url: BASE },
+      // 工具
+      { cat: "tool", icon: "⏰", title: "事件时间表", url: BASE },
+      { cat: "tool", icon: "👹", title: "BOSS计时", url: BASE },
+      { cat: "tool", icon: "📋", title: "日常清单", url: BASE },
+      { cat: "tool", icon: "🗺️", title: "在线地图", url: BASE },
+      { cat: "tool", icon: "🔑", title: "代码生成", url: BASE },
+      { cat: "tool", icon: "📢", title: "官方活动", url: BASE },
 
-      // 数据库与配装
-      { cat: "db", icon: "🛡️", title: "BD 配装参考", desc: "各职业主流配装与循环", url: BASE },
-      { cat: "db", icon: "📦", title: "物品与配方库", desc: "材料出处 / 神秘熔炉配方", url: BASE },
-      { cat: "db", icon: "🏆", title: "成就数据库", desc: "按游戏风格检索成就攻略", url: BASE },
-      { cat: "db", icon: "👗", title: "幻化分享", desc: "外观搭配与染料参考", url: BASE }
+      // 数据库
+      { cat: "db", icon: "🛡️", title: "BD 配装", url: BASE },
+      { cat: "db", icon: "📦", title: "物品配方", url: BASE },
+      { cat: "db", icon: "🏆", title: "成就查询", url: BASE },
+      { cat: "db", icon: "👗", title: "幻化分享", url: BASE }
     ];
 
     const CAT_NAMES = {
@@ -229,21 +272,54 @@
 
     let currentCat = "all";
     let keyword = "";
+    let toastTimer = null;
 
+    // 渲染一键复制区
+    function renderCodes() {
+      const el = document.getElementById("codeList");
+      el.innerHTML = QUICK_CODES.map(c =>
+        `<div class="code-chip" onclick="copyCode('${c.code}', '${c.name}')">${c.name}</div>`
+      ).join("");
+    }
+
+    // 复制功能
+    window.copyCode = function(code, name) {
+      navigator.clipboard.writeText(code).then(() => {
+        showToast(`已复制：${name} ${code}`);
+      }).catch(() => {
+        // 兼容旧内核的备用复制方案
+        const input = document.createElement("input");
+        input.value = code;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand("copy");
+        document.body.removeChild(input);
+        showToast(`已复制：${name}`);
+      });
+    };
+
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove("show"), 1600);
+    }
+
+    // 渲染主网格
     function render() {
       const container = document.getElementById("content");
       const filtered = DATA.filter(item => {
         const matchCat = currentCat === "all" || item.cat === currentCat;
-        const matchKey = !keyword || (item.title + item.desc).toLowerCase().includes(keyword);
+        const matchKey = !keyword || item.title.toLowerCase().includes(keyword);
         return matchCat && matchKey;
       });
 
-      if (filtered.length === 0) {
-        container.innerHTML = `<div class="empty">没找到相关内容，试试换个关键词</div>`;
+      if (!filtered.length) {
+        container.innerHTML = `<div class="empty">无匹配项</div>`;
         return;
       }
 
-      // 按分类分组渲染
       const groups = {};
       filtered.forEach(item => {
         if (!groups[item.cat]) groups[item.cat] = [];
@@ -252,12 +328,12 @@
 
       let html = "";
       Object.keys(groups).forEach(cat => {
-        html += `<div class="section-title">${CAT_NAMES[cat]}</div><div class="grid">`;
+        html += `<div class="sec-title"><span>${CAT_NAMES[cat]}</span></div><div class="grid">`;
         groups[cat].forEach(item => {
           html += `
-            <a class="card" href="${item.url}" target="_blank">
-              <div class="card-head"><span>${item.icon}</span><span>${item.title}</span></div>
-              <div class="card-desc">${item.desc}</div>
+            <a class="item" href="${item.url}">
+              <span class="item-icon">${item.icon}</span>
+              <span class="item-text">${item.title}</span>
             </a>`;
         });
         html += `</div>`;
@@ -265,8 +341,7 @@
       container.innerHTML = html;
     }
 
-    // 绑定搜索与分类切换
-    document.getElementById("searchInput").addEventListener("input", e => {
+    document.getElementById("search").addEventListener("input", e => {
       keyword = e.target.value.trim().toLowerCase();
       render();
     });
@@ -279,6 +354,7 @@
       render();
     });
 
+    renderCodes();
     render();
   </script>
 </body>
